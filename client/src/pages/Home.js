@@ -4,13 +4,20 @@ import { useQuery } from "@apollo/client"; //hook from AC
 // will allow us to make requests to the graphQL server we connected to and made available to the app using the Apollo Provider component from App.js
 
 // we can use this query with the hook functionality above ^ and query thought data!
-import { QUERY_THOUGHTS } from "../utils/queries";
+import { QUERY_THOUGHTS, QUERY_ME_BASIC } from "../utils/queries";
+import Auth from "../utils/auth";
 
 import ThoughtList from "../components/ThoughtList";
+import FriendList from "../components/FriendList";
 
 const Home = () => {
+    const loggedIn = Auth.loggedIn();
+
     // use useQuery hook to make query request
     const { loading, data } = useQuery(QUERY_THOUGHTS);
+    // use object destructuring to extract data fom useQuery hooks res and rename it userData so it's more descriptive
+    const { data: userData } = useQuery(QUERY_ME_BASIC);
+    // now, if user is logged in and has valid token, userData will hold all of returned info from query
 
     // loading property indicates that the request isnt done just yet; when it's finished, and data returned from server, then
     // that info is stored in destructured data property
@@ -22,7 +29,8 @@ const Home = () => {
     return (
         <main>
             <div className="flex-row justify-space-between">
-                <div className="col-12 mb-3">
+                {/* creates a 2 col layout IF user is logged in */}
+                <div className={`col-12 mb-3 ${loggedIn && "col-lg-8"}`}>
                     {/* if data is still loading (i.e. loading is DEFINED), then indicate so with "loading" div. ELSE, display ThoughtList component with appropriate props */}
                     {loading ? (
                         <div>Loading...</div>
@@ -33,6 +41,17 @@ const Home = () => {
                         ></ThoughtList>
                     )}
                 </div>
+
+                {/* If loggedIn ===TRUE and there IS userData, then FriendList component will load */}
+                {loggedIn && userData ? (
+                    <div className="col-12 col-lg-3 mb-3">
+                        <FriendList
+                            username={userData.me.username}
+                            friendCount={userData.me.friendCount}
+                            friends={userData.me.friends}
+                        />
+                    </div>
+                ) : null}
             </div>
         </main>
     );

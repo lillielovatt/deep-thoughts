@@ -1,29 +1,51 @@
 import React from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import ThoughtList from "../components/ThoughtList";
 import FriendList from "../components/FriendList";
 import { useQuery } from "@apollo/client";
-import { QUERY_USER } from "../utils/queries";
+import { QUERY_USER, QUERY_ME } from "../utils/queries";
+import Auth from "../utils/auth";
 
 const Profile = () => {
     const { username: userParam } = useParams(); //retrieves username from URL, passes it to useQuery
 
-    const { loading, data } = useQuery(QUERY_USER, {
+    // If there is a userParam value that we got from URL bar, we'll use that value to run QUERY_USER
+    // if there's no value in userParam, if we just visit /profile as a loggedIn user, we'll run QUERY_ME instead
+    const { loading, data } = useQuery(userParam ? QUERY_USER : QUERY_ME, {
         variables: { username: userParam },
     });
 
-    const user = data?.user || {};
+    // QUERY_ME - res will return our data in me property
+    // QUERY_USER - res will return our data in user property
+    const user = data?.me || data?.user || {};
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    console.log(Auth.getProfile().data.username);
+    console.log(userParam);
+
+    // navigate to personal profile page if username is the logged-in user's
+    if (Auth.loggedIn() && Auth.getProfile().data.username === userParam) {
+        return <Navigate to="/profile" />;
+    }
+
+    if (!user?.username) {
+        return (
+            <h4>
+                You need to be logged in to see this page. Use the navigation
+                links above to sign up or log in!
+            </h4>
+        );
     }
 
     return (
         <div>
             <div className="flex-row mb-3">
                 <h2 className="bg-dark text-secondary p-3 display-inline-block">
-                    Viewing {user.username}'s profile.
+                    Viewing {userParam ? `${user.username}'s` : "your"} profile.
                 </h2>
             </div>
 

@@ -17,15 +17,33 @@ import {
     createHttpLink, //allows us to control how the AC makes a request (like middleware for outbound network requests)
 } from "@apollo/client";
 
+// function setContext creates middleware function that retrieves token for us and combines it with existing httpLink
+import { setContext } from "@apollo/client/link/context";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // establish a new link to the GraphQL server at its /graphql endpoint
 const httpLink = createHttpLink({
     uri: "/graphql", // fixes issue of absolute path to the server
 });
+
+// _, here indicates we do not need access to the parameter that comes first. Cannot skip, it's very specific order, so use _ instead as a placeholder
+const authLink = setContext((_, { headers }) => {
+    // use setContext function to retrieve token from localStorage and set the HTTP request headers of every req to include the token
+    // whether req needs it or not (if req doesn't need token, server-side resolver won't check for it)
+    const token = localStorage.getItem("id_token");
+    return {
+        headers: {
+            ...headers,
+            authorization: token ? `Bearer ${token}` : "",
+        },
+    };
+});
+
 // use the AC constructor to instantiate the AC instance and create the connection to the API endpoint
+// combine authLink and httpLink objects so every req retrieves the token and sets the req headers before making req to API
 const client = new ApolloClient({
-    link: httpLink,
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
 });
 
