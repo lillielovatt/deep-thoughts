@@ -1,5 +1,6 @@
 // get our Apollo server hooked into our existing Express.js server and set it up with our type definitions and resolvers
 const { authMiddleware } = require("./utils/auth");
+const path = require("path");
 const express = require("express");
 // import ApolloServer
 const { ApolloServer } = require("apollo-server-express");
@@ -24,6 +25,17 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// serve up static assets (only goes into effect when we go into production)
+// if it is in production, we tell Express.js server to serve any files in React app's build directory in client folder
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../client/build")));
+}
+// wildcard GET route for server--if we make a GET request to any locatio on server that doesn't have an explicit route defined,
+// respond with production ready React front end code
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/build/index.html"));
+});
 
 // create a new instance of an Apollo server with the GraphQl schema
 const startApolloServer = async () => {
