@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 // receives 2 props - title, and thoughts array.
 const ThoughtList = ({ thoughts, title }) => {
@@ -16,17 +17,26 @@ const ThoughtList = ({ thoughts, title }) => {
                     // key prop helps React internally track which data needs to be re-rendered if something changes.
                     <div key={thought._id} className="card mb-3">
                         <p className="card-header">
-                            {thought.username}
+                            <Link
+                                to={`/profile/${thought.username}`}
+                                style={{ fontWeight: 700 }}
+                                className="text-light"
+                            >
+                                {thought.username}
+                            </Link>{" "}
                             thought on {thought.createdAt}
                         </p>
                         <div className="card-body">
-                            <p>{thought.thoughtText}</p>
-                            <p className="mb-0">
-                                Reactions:{thought.reactionCount} || Click to{" "}
-                                {thought.reactionCount ? "see" : "start"} the
-                                discussion!
-                                {/* if there ARE reactions, then SEE the discussion, else START it */}
-                            </p>
+                            <Link to={`/thought/${thought._id}`}>
+                                <p>{thought.thoughtText}</p>
+
+                                <p className="mb-0">
+                                    Reactions:{thought.reactionCount} || Click
+                                    to {thought.reactionCount ? "see" : "start"}{" "}
+                                    the discussion!
+                                    {/* if there ARE reactions, then SEE the discussion, else START it */}
+                                </p>
+                            </Link>
                         </div>
                     </div>
                 ))}
