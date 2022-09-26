@@ -1,18 +1,12 @@
-require("dotenv").config();
+// require("dotenv").config();
 const jwt = require("jsonwebtoken");
 // import jwt from "jsonwebtoken";
 
-const secret = process.env.secret;
+// const secret = process.env.secret;
+const secret = "shhhhh";
 const expiration = "2h";
 
 module.exports = {
-    // expects a user object, adds user's properties to token
-    // optional: exp, and secret (has nothing to do with encoding)
-    // A TOKEN IS NOT PART OF THE USER MODEL
-    signToken: function ({ username, email, _id }) {
-        const payload = { username, email, _id };
-        return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
-    },
     authMiddleware: function ({ req }) {
         // allows tokens to be sent via req.body, req.query, or headers
         let token =
@@ -39,5 +33,13 @@ module.exports = {
 
         // return updated request object
         return req;
+    },
+
+    // expects a user object, adds user's properties to token
+    // optional: exp, and secret (has nothing to do with encoding)
+    // A TOKEN IS NOT PART OF THE USER MODEL
+    signToken: function ({ username, email, _id }) {
+        const payload = { username, email, _id };
+        return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
     },
 };
