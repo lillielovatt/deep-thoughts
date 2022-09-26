@@ -30,12 +30,33 @@ const typeDefs = gql`
     }
 
     type Query {
+        me: User
         users: [User]
         user(username: String!): User
         thoughts(username: String): [Thought]
         thought(_id: ID!): Thought
     }
+
+    type Mutation {
+        login(email: String!, password: String!): Auth
+        addUser(username: String!, email: String!, password: String!): Auth
+        addThought(thoughtText: String!): Thought
+        addReaction(thoughtId: ID!, reactionBody: String!): Thought
+        addFriend(friendId: ID!): User
+    }
+
+    type Auth {
+        token: ID!
+        user: User
+    }
 `;
+//addReaction will return the parent Thought instead of newly created Reaction (because front end will track changes on thought level, not reaction level)
+// i.e. when someone posts a comment to a thread, you'd want to return the new thread, not just the new comment.
+
+//auth type must return a token, can optionally include any other User data
+
+// login mutation - returns User object, either one who successfully logged in
+// ...or user who was just created thru sign up
 
 // ID! indicates that for that query to be carried out, the data MUST exist.
 // otherwise, Apollo will return error to client making request and query won't even reach the resolver function assoc with it
