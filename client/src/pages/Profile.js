@@ -3,12 +3,15 @@ import React from "react";
 import { useParams, Navigate } from "react-router-dom";
 import ThoughtList from "../components/ThoughtList";
 import FriendList from "../components/FriendList";
-import { useQuery } from "@apollo/client";
+import ThoughtForm from "../components/ThoughtForm";
+import { useQuery, useMutation } from "@apollo/client";
 import { QUERY_USER, QUERY_ME } from "../utils/queries";
 import Auth from "../utils/auth";
+import { ADD_FRIEND } from "../utils/mutation";
 
 const Profile = () => {
     const { username: userParam } = useParams(); //retrieves username from URL, passes it to useQuery
+    const [addFriend] = useMutation(ADD_FRIEND);
 
     // If there is a userParam value that we got from URL bar, we'll use that value to run QUERY_USER
     // if there's no value in userParam, if we just visit /profile as a loggedIn user, we'll run QUERY_ME instead
@@ -41,12 +44,28 @@ const Profile = () => {
         );
     }
 
+    const handleClick = async () => {
+        try {
+            await addFriend({
+                variables: { id: user._id },
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div>
             <div className="flex-row mb-3">
                 <h2 className="bg-dark text-secondary p-3 display-inline-block">
                     Viewing {userParam ? `${user.username}'s` : "your"} profile.
                 </h2>
+
+                {userParam && (
+                    <button className="btn ml-auto" onClick={handleClick}>
+                        Add Friend
+                    </button>
+                )}
             </div>
 
             <div className="flex-row justify-space-between mb-3">
@@ -66,6 +85,8 @@ const Profile = () => {
                     />
                 </div>
             </div>
+
+            <div className="mb-3">{!userParam && <ThoughtForm />}</div>
         </div>
     );
 };
