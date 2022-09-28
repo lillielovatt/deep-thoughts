@@ -31,7 +31,7 @@ const resolvers = {
         me: async (parent, args, context) => {
             //check for existence of context.user (if none exists, then we know user ISN'T authenticated and we can throw error)
             if (context.user) {
-                const userData = await User.findOne({})
+                const userData = await User.findOne({ _id: context.user._id })
                     .select("-__v -password")
                     .populate("thoughts")
                     .populate("friends");

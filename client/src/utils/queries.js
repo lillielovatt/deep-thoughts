@@ -59,7 +59,8 @@ export const QUERY_USER = gql`
     }
 `;
 
-// doesn't have same syntax as the others, because we aren't passing any vars to it. We can just name query and GraphQL will do the rest
+// doesn't have same syntax as the others, because we aren't passing any vars to it. 
+// We can just name query and GraphQL will do the rest
 export const QUERY_ME = gql`
     {
         me {

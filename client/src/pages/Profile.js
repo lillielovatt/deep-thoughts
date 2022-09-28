@@ -11,6 +11,7 @@ import { ADD_FRIEND } from "../utils/mutation";
 
 const Profile = () => {
     const { username: userParam } = useParams(); //retrieves username from URL, passes it to useQuery
+    console.log(userParam);
     const [addFriend] = useMutation(ADD_FRIEND);
 
     // If there is a userParam value that we got from URL bar, we'll use that value to run QUERY_USER
@@ -22,6 +23,8 @@ const Profile = () => {
     // QUERY_ME - res will return our data in me property
     // QUERY_USER - res will return our data in user property
     const user = data?.me || data?.user || {};
+    console.log("user", user);
+    console.log("data", data);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -32,6 +35,7 @@ const Profile = () => {
 
     // navigate to personal profile page if username is the logged-in user's
     if (Auth.loggedIn() && Auth.getProfile().data.username === userParam) {
+        console.log("1", userParam);
         return <Navigate to="/profile" />;
     }
 
